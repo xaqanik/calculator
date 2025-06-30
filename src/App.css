@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
+
+body {
+  background: linear-gradient(to right, #4facfe, #00f2fe);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+.calculator-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.calculator {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 25px;
+  width: 400px;
+}
+
+.display {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 15px;
+  padding: 25px;
+  text-align: right;
+  margin-bottom: 25px;
+  color: white;
+  font-size: 2.5em;
+  font-weight: 300;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+}
+
+button {
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  border-radius: 15px;
+  padding: 20px;
+  font-size: 1.3em;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 400;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+.button-clear {
+  background: rgba(255, 82, 82, 0.7);
+}
+
+.button-clear:hover {
+  background: rgba(255, 82, 82, 0.9);
+}
+
+.button-operator {
+  background: rgba(255, 159, 67, 0.7);
+}
+
+.button-operator:hover {
+  background: rgba(255, 159, 67, 0.9);
+}
+
+.button-function {
+  background: rgba(63, 191, 127, 0.7);
+}
+
+.button-function:hover {
+  background: rgba(63, 191, 127, 0.9);
+}
+
+.button-equal {
+  grid-column: span 2;
+  background: rgba(63, 127, 191, 0.7);
+}
+
+.button-equal:hover {
+  background: rgba(63, 127, 191, 0.9);
+}
+
+.button-zero {
+  grid-column: span 2;
+}
