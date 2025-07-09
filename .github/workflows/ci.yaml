@@ -24,11 +24,13 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          # Use the GITHUB_SHA environment variable to create a unique tag.
-          # We use 'cut' to get the first 7 characters for a shorter tag.
-          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+         IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-7)
 
-          # Build the image with both the 'latest' and the unique commit tag.
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp:${IMAGE_TAG} .
-          # Push both tags to Docker Hub.
-          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:${IMAGE_TAG}
+         # Build image with both tags
+         docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp:${IMAGE_TAG} \
+                 -t ${{ secrets.DOCKER_USERNAME }}/myapp:latest .
+
+         # Push both tags to Docker Hub
+         docker push ${{ secrets.DOCKER_USERNAME }}/myapp:${IMAGE_TAG}
+         docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
+
