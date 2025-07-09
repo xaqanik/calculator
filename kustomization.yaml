@@ -1,0 +1,11 @@
+# myapp-kubernetes-manifests/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - k8s/deployment.yaml # Or whatever path your deployment is in
+  - k8s/service.yaml    # Or whatever path your service is in
+
+images:
+  - name: your-docker-username/myapp # This MUST match the image name in your deployment.yaml
+    newTag: latest # ArgoCD will use this, or you'll update it for new versions
