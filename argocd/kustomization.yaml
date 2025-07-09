@@ -7,5 +7,5 @@ resources:
   - k8s/service.yaml    # Or whatever path your service is in
 
 images:
-  - name: ${{ secrets.DOCKER_USERNAME }}/myapp # This MUST match the image name in your deployment.yaml
+  - name: xaqani90/myapp # This MUST match the image name in your deployment.yaml
     newTag: latest # ArgoCD will use this, or you'll update it for new versions
