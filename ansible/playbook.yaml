@@ -40,7 +40,7 @@
 
     - name: Pull and run the application container
       docker_container:
-        name: webapp
+        name: calculator
         image: xaqani90/calc # <-- IMPORTANT: Change this to your Docker image!
         state: started
         restart_policy: always
