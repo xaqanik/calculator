@@ -2,7 +2,7 @@
 
 plugin: gcp_compute
 projects:
-  -  mystical-vial-403905
+  - mystical-vial-403905
 auth_kind: application # This will use the credentials from the GitHub Actions environment
 keyed_groups:
   # Group hosts by the value of the 'ansible-group' label
