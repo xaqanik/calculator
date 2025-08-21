@@ -60,7 +60,7 @@
     - name: Pull and run the application container
       community.docker.docker_container:
         name: calculator
-        image: xaqani90/calc
+        image: "{{ docker_image }}"
         state: started
         restart_policy: always
         published_ports:

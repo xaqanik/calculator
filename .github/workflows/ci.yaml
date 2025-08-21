@@ -5,7 +5,20 @@ on:
     branches: [ master ]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Test
+        run: npm test
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,13 +35,24 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Authorize Docker push
+        run: gcloud auth configure-docker
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t "gcr.io/${{ secrets.GCP_PROJECT_ID }}/calculator:${{ github.sha }}" .
+          docker push "gcr.io/${{ secrets.GCP_PROJECT_ID }}/calculator:${{ github.sha }}"
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Apply
         working-directory: ./terraform
         run: |
-          terraform init
+          terraform init -backend-config="bucket=${{ secrets.GCS_BUCKET_NAME }}"
           terraform apply -auto-approve \
             -var="gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
@@ -44,25 +68,14 @@ jobs:
           pip install "ansible>=9.0.0" google-auth-httplib2 requests
           ansible-galaxy collection install google.cloud community.docker
 
-      - name: Write Ansible config (enable gcp plugin)
-        working-directory: ./ansible
-        run: |
-          cat > ansible.cfg <<'CFG'
-          [defaults]
-          host_key_checking = False
-          inventory = ./inventory.gcp.yml
-          callback_whitelist = profile_tasks
-
-          [inventory]
-          enable_plugins = gcp_compute, yaml, ini
-          CFG
+      
 
       - name: Check inventory (debug)
         working-directory: ./ansible
         env:
           # Auth action already exports GOOGLE_APPLICATION_CREDENTIALS
           CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-        run: ansible-inventory -i inventory.gcp.yml --list
+        run: ansible-inventory -i inventory.gcp_compute.yml --list
 
       - name: Run Ansible Playbook
         working-directory: ./ansible
@@ -75,4 +88,5 @@ jobs:
           ansible-playbook playbook.yml \
            -i inventory.gcp_compute.yml \
            --user ansible \
-           --private-key private_key.pem
+           --private-key private_key.pem \
+           --extra-vars "docker_image=gcr.io/${{ secrets.GCP_PROJECT_ID }}/calculator:${{ github.sha }}"
