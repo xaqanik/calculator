@@ -64,6 +64,6 @@ jobs:
           # Run the playbook against the dynamic inventory file.
           # Ansible will now find the new VM automatically by its label.
           ansible-playbook playbook.yml \
-            -i inventory.gcp.yml \
+            -i inventory.gcp_compute.yml \
             --user ansible \
             --private-key private_key.pem
