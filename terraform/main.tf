@@ -36,6 +36,13 @@ resource "google_compute_instance" "app_instance" {
   zone         = "us-central1-c"
   tags         = ["web-server"] # Apply the firewall rule tag
 
+  # --- MODIFICATION START ---
+  # This label is what Ansible's dynamic inventory will use to find this VM.
+  labels = {
+    ansible-group = "web-server"
+  }
+  # --- MODIFICATION END ---
+
   # Use a standard Debian image
   boot_disk {
     initialize_params {

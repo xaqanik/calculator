@@ -1,7 +1,16 @@
 ---
 - name: Configure server and deploy application
-  hosts: all # This will target the VM we create
+  hosts: all # This will dynamically target hosts in the 'web-server' group from GCP
   become: yes # Use 'sudo' for tasks
+  gather_facts: no # Speeds up connection by not gathering facts right away
+
+  pre_tasks:
+    - name: Wait for SSH to become available on the new instance
+      wait_for_connection:
+        timeout: 120 # Wait up to 2 minutes
+        delay: 15    # Check every 15 seconds
+    - name: Gather facts after connection is established
+      setup:
 
   tasks:
     - name: Update apt package cache
@@ -9,7 +18,7 @@
         update_cache: yes
         cache_valid_time: 3600 # One hour
 
-    - name: Install prerequisite packages
+    - name: Install prerequisite packages for Docker
       apt:
         name:
           - apt-transport-https
@@ -24,12 +33,13 @@
         url: https://download.docker.com/linux/debian/gpg
         state: present
 
-    - name: Set up the Docker repository
+    - name: Set up the Docker repository for Debian 11
       apt_repository:
-        repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
+        # CORRECTED: Use 'bullseye' for Debian 11, not 'buster'
+        repo: deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable
         state: present
 
-    - name: Install Docker
+    - name: Install Docker Engine
       apt:
         name:
           - docker-ce
@@ -38,10 +48,16 @@
         state: present
         update_cache: yes
 
+    - name: Ensure Docker service is started and enabled on boot
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
     - name: Pull and run the application container
       docker_container:
         name: calculator
-        image: xaqani90/calc # <-- IMPORTANT: Change this to your Docker image!
+        image: xaqani90/calc # Your Docker image
         state: started
         restart_policy: always
         published_ports:

@@ -1,0 +1,16 @@
+# inventory.gcp.yml
+
+plugin: gcp_compute
+projects:
+  -  mystical-vial-403905
+auth_kind: application # This will use the credentials from the GitHub Actions environment
+keyed_groups:
+  # Group hosts by the value of the 'ansible-group' label
+  - key: labels['ansible-group']
+    prefix: ''
+hostnames:
+  # Use the public IP address to connect
+  - key: networkInterfaces[0].accessConfigs[0].natIP
+compose:
+  # Set the connection variable for Ansible
+  ansible_host: networkInterfaces[0].accessConfigs[0].natIP
