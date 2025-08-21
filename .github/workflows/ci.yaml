@@ -73,5 +73,6 @@ jobs:
           chmod 600 private_key.pem
 
           ansible-playbook playbook.yml \
-            --user ansible \
-            --private-key private_key.pem
+           -i inventory.gcp_compute.yml \
+           --user ansible \
+           --private-key private_key.pem
