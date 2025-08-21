@@ -1,11 +1,18 @@
 plugin: gcp_compute
 projects:
-  - mystical-vial-403905
+  - "{{ lookup('env', 'CLOUDSDK_CORE_PROJECT') }}"
 auth_kind: serviceaccount
-keyed_groups:
-  - key: labels['ansible-group']
-    prefix: ''
+# google-github-actions/auth@v2 sets GOOGLE_APPLICATION_CREDENTIALS to the temp JSON file
+service_account_file: "{{ lookup('env', 'GOOGLE_APPLICATION_CREDENTIALS') }}"
+
+# Use instance public IP for SSH
 hostnames:
   - key: networkInterfaces[0].accessConfigs[0].natIP
+
 compose:
   ansible_host: networkInterfaces[0].accessConfigs[0].natIP
+
+# (Optional later) Grouping by label; keep commented until you confirm inventory works
+# keyed_groups:
+#   - key: labels['ansible-group']
+#     prefix: ''

@@ -1,41 +1,39 @@
 ---
 - name: Configure server and deploy application
-  hosts: all # This will dynamically target hosts in the 'web-server' group from GCP
-  become: yes # Use 'sudo' for tasks
-  gather_facts: no # Speeds up connection by not gathering facts right away
+  hosts: all
+  become: true
+  gather_facts: false
 
   pre_tasks:
-    - name: Wait for SSH to become available on the new instance
+    - name: Wait for SSH to become available
       wait_for_connection:
-        timeout: 120 # Wait up to 2 minutes
-        delay: 15    # Check every 15 seconds
-    - name: Gather facts after connection is established
+        timeout: 180
+        delay: 10
+
+    - name: Gather facts
       setup:
 
-  tasks:
-    - name: Update apt package cache
-      apt:
-        update_cache: yes
-        cache_valid_time: 3600 # One hour
-
-    - name: Install prerequisite packages for Docker
+    - name: Ensure base packages for Docker/Ansible are present
       apt:
         name:
+          - python3
+          - python3-pip
           - apt-transport-https
           - ca-certificates
           - curl
           - gnupg-agent
           - software-properties-common
         state: present
+        update_cache: yes
 
+  tasks:
     - name: Add Docker's official GPG key
       apt_key:
         url: https://download.docker.com/linux/debian/gpg
         state: present
 
-    - name: Set up the Docker repository for Debian 11
+    - name: Set up the Docker repository for Debian 11 (bullseye)
       apt_repository:
-        # CORRECTED: Use 'bullseye' for Debian 11, not 'buster'
         repo: deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable
         state: present
 
@@ -48,17 +46,22 @@
         state: present
         update_cache: yes
 
-    - name: Ensure Docker service is started and enabled on boot
+    - name: Ensure Docker service is started and enabled
       service:
         name: docker
         state: started
         enabled: yes
 
+    # docker_container module needs the Docker SDK for Python on the TARGET host
+    - name: Install Python Docker SDK on the host
+      pip:
+        name: docker
+
     - name: Pull and run the application container
-      docker_container:
+      community.docker.docker_container:
         name: calculator
-        image: xaqani90/calc # Your Docker image
+        image: xaqani90/calc
         state: started
         restart_policy: always
         published_ports:
-          - "80:80" # Map container port 80 to host port 80
+          - "80:80"
