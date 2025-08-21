@@ -4,7 +4,7 @@ name: Deploy to GCP
 on:
   push:
     branches:
-      - master # Or 'main' depending on your branch namess
+      - master # Or 'main' depending on your branch namesss
 
 jobs:
   deploy:
