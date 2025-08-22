@@ -1,19 +1,22 @@
----
+
+# ansible/playbook.yml
+
 - name: Configure server and deploy application
-  hosts: all
+  # [CHANGE] Target the specific 'web-server' group defined by the inventory file.
+  hosts: web-server
   become: true
   gather_facts: false
 
   pre_tasks:
-    - name: Wait for SSH to become available
+    - name: Wait for SSH to become available on the new instance
       wait_for_connection:
-        timeout: 180
-        delay: 10
+        timeout: 180 # Wait for up to 3 minutes
+        delay: 10    # Check every 10 seconds
 
-    - name: Gather facts
+    - name: Gather facts after connection is established
       setup:
 
-    - name: Ensure base packages for Docker/Ansible are present
+    - name: Ensure base packages for Docker are present
       apt:
         name:
           - python3
@@ -46,22 +49,24 @@
         state: present
         update_cache: yes
 
-    - name: Ensure Docker service is started and enabled
+    - name: Ensure Docker service is started and enabled on boot
       service:
         name: docker
         state: started
         enabled: yes
 
-    # docker_container module needs the Docker SDK for Python on the TARGET host
-    - name: Install Python Docker SDK on the host
+    # The community.docker.docker_container module requires the Docker SDK for Python on the TARGET host.
+    - name: Install Docker SDK for Python
       pip:
         name: docker
 
-    - name: Pull and run the application container
+    - name: Pull the latest application image and run the container
       community.docker.docker_container:
         name: calculator
+        # This variable is passed from the GitHub Actions workflow
         image: "{{ docker_image }}"
         state: started
         restart_policy: always
         published_ports:
+          # Map port 80 on the host to port 80 in the container
           - "80:80"
