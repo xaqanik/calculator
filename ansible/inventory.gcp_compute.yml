@@ -1,3 +1,5 @@
+
+
 # ansible/inventory.gcp_compute.yml
 
 plugin: gcp_compute
@@ -5,10 +7,12 @@ projects:
   # This correctly pulls the project ID from the CI environment.
   - "{{ lookup('env', 'CLOUDSDK_CORE_PROJECT') }}"
 
-# [FIX] Removed the 'service_account_file' line.
-# The plugin will now automatically use the GOOGLE_APPLICATION_CREDENTIALS
-# environment variable set by the google-github-actions/auth step.
 auth_kind: serviceaccount
+
+# [FIX] Explicitly provide the service account credentials.
+# Instead of a file path, this reads the JSON key directly from the
+# GCP_SA_KEY secret, which is available as an environment variable.
+service_account_contents: "{{ lookup('env', 'GCP_SA_KEY') }}"
 
 filters:
   - "status = RUNNING"
@@ -22,4 +26,3 @@ compose:
 keyed_groups:
   - key: labels['ansible-group']
     prefix: ''
-
