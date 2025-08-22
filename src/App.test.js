@@ -4,16 +4,16 @@ import App from './App';
 describe('Calculator', () => {
   test('renders calculator', () => {
     render(<App />);
-    const display = screen.getByText('0');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('0');
   });
 
   test('handles number clicks', () => {
     render(<App />);
     const sevenButton = screen.getByText('7');
     fireEvent.click(sevenButton);
-    const display = screen.getByText('7');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('7');
   });
 
   test('handles multiple number clicks', () => {
@@ -22,8 +22,8 @@ describe('Calculator', () => {
     fireEvent.click(sevenButton);
     const eightButton = screen.getByText('8');
     fireEvent.click(eightButton);
-    const display = screen.getByText('78');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('78');
   });
 
   test('handles operator clicks', () => {
@@ -34,8 +34,8 @@ describe('Calculator', () => {
     fireEvent.click(plusButton);
     const eightButton = screen.getByText('8');
     fireEvent.click(eightButton);
-    const display = screen.getByText('7+8');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('7+8');
   });
 
   test('handles clear click', () => {
@@ -44,8 +44,8 @@ describe('Calculator', () => {
     fireEvent.click(sevenButton);
     const clearButton = screen.getByText('C');
     fireEvent.click(clearButton);
-    const display = screen.getByText('0');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('0');
   });
 
   test('handles calculation', () => {
@@ -58,8 +58,8 @@ describe('Calculator', () => {
     fireEvent.click(eightButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('15');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('15');
   });
 
   test('handles division', () => {
@@ -74,8 +74,8 @@ describe('Calculator', () => {
     fireEvent.click(twoButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('5');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('5');
   });
 
   test('handles multiplication', () => {
@@ -88,8 +88,8 @@ describe('Calculator', () => {
     fireEvent.click(eightButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('56');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('56');
   });
 
   test('handles subtraction', () => {
@@ -102,8 +102,8 @@ describe('Calculator', () => {
     fireEvent.click(eightButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('-1');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('-1');
   });
 
   test('handles sin function', () => {
@@ -116,8 +116,8 @@ describe('Calculator', () => {
     fireEvent.click(closeParenButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('0');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('0');
   });
 
   test('handles cos function', () => {
@@ -130,8 +130,8 @@ describe('Calculator', () => {
     fireEvent.click(closeParenButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('1');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('1');
   });
 
   test('handles tan function', () => {
@@ -144,8 +144,8 @@ describe('Calculator', () => {
     fireEvent.click(closeParenButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('0');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('0');
   });
 
   test('handles sqrt function', () => {
@@ -156,8 +156,8 @@ describe('Calculator', () => {
     fireEvent.click(nineButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('3');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('3');
   });
 
   test('handles power function', () => {
@@ -170,8 +170,8 @@ describe('Calculator', () => {
     fireEvent.click(threeButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('8');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('8');
   });
 
   test('handles error', () => {
@@ -182,7 +182,7 @@ describe('Calculator', () => {
     fireEvent.click(plusButton);
     const equalsButton = screen.getByText('=');
     fireEvent.click(equalsButton);
-    const display = screen.getByText('Error');
-    expect(display).toBeInTheDocument();
+    const display = screen.getByTestId('display');
+    expect(display).toHaveTextContent('Error');
   });
 });

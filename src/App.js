@@ -30,7 +30,7 @@ const App = () => {
   return (
     <div className="calculator-container">
       <div className="calculator">
-        <div className="display">{input || '0'}</div>
+        <div className="display" data-testid="display">{input || '0'}</div>
         <div className="buttons-grid">
           <button onClick={() => handleFunction('sin')} className="button-function">sin</button>
           <button onClick={() => handleFunction('cos')} className="button-function">cos</button>
