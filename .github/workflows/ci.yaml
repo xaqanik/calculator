@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    # ... (test job is unchanged) ...
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -53,7 +54,6 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      # [FIX] The 'terraform apply' command has been updated to include the missing variable.
       - name: Terraform Apply
         working-directory: ./terraform
         run: |
@@ -62,7 +62,7 @@ jobs:
             -var="gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
             -var="gcs_bucket_name=${{ secrets.GCS_BUCKET_NAME }}"
-        # [FIX] Add a delay to allow the GCP API to update after VM creation.
+
       - name: Wait for GCP API to Register New VM
         run: sleep 100s
 
@@ -77,16 +77,20 @@ jobs:
           pip install "ansible>=9.0.0" google-auth-httplib2 requests
           ansible-galaxy collection install google.cloud community.docker
 
+      # [FIX] Re-added the GCP_SA_KEY environment variable for authentication.
       - name: Check inventory (debug)
         working-directory: ./ansible
         env:
           CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_SA_KEY: '${{ secrets.GCP_SA_KEY }}'
         run: ansible-inventory -i inventory.gcp_compute.yml --list
 
+      # [FIX] Re-added the GCP_SA_KEY environment variable for authentication.
       - name: Run Ansible Playbook
         working-directory: ./ansible
         env:
           CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_SA_KEY: '${{ secrets.GCP_SA_KEY }}'
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
           chmod 600 private_key.pem
