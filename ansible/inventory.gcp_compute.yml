@@ -1,5 +1,3 @@
-
-
 # ansible/inventory.gcp_compute.yml
 
 plugin: gcp_compute
@@ -7,12 +5,12 @@ projects:
   # This correctly pulls the project ID from the CI environment.
   - "{{ lookup('env', 'CLOUDSDK_CORE_PROJECT') }}"
 
-auth_kind: serviceaccount
+# [FIX] Changed auth_kind to 'application'.
+# This tells the plugin to use the Application Default Credentials
+# that the 'Authenticate to GCP' step has already set up.
+auth_kind: application
 
-# [FIX] Explicitly provide the service account credentials.
-# Instead of a file path, this reads the JSON key directly from the
-# GCP_SA_KEY secret, which is available as an environment variable.
-service_account_contents: "{{ lookup('env', 'GCP_SA_KEY') }}"
+# [FIX] Removed the service_account_contents line that was causing the error.
 
 filters:
   - "status = RUNNING"
