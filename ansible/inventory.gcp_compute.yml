@@ -5,12 +5,11 @@ projects:
   # This correctly pulls the project ID from the CI environment.
   - "{{ lookup('env', 'CLOUDSDK_CORE_PROJECT') }}"
 
-# [FIX] Changed auth_kind to 'application'.
-# This tells the plugin to use the Application Default Credentials
-# that the 'Authenticate to GCP' step has already set up.
-auth_kind: application
+auth_kind: serviceaccount
 
-# [FIX] Removed the service_account_contents line that was causing the error.
+# [FIX] Restored to explicitly provide the service account credentials
+# by reading the JSON key directly from the environment variable.
+service_account_contents: "{{ lookup('env', 'GCP_SA_KEY') }}"
 
 filters:
   - "status = RUNNING"
