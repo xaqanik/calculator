@@ -62,6 +62,9 @@ jobs:
             -var="gcp_project_id=${{ secrets.GCP_PROJECT_ID }}" \
             -var="ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}" \
             -var="gcs_bucket_name=${{ secrets.GCS_BUCKET_NAME }}"
+        # [FIX] Add a delay to allow the GCP API to update after VM creation.
+      - name: Wait for GCP API to Register New VM
+        run: sleep 100s
 
       - name: Setup Python
         uses: actions/setup-python@v5
