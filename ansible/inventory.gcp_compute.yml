@@ -2,26 +2,24 @@
 
 plugin: gcp_compute
 projects:
-  # This lookup correctly pulls the project ID from the environment variable set by the CI pipeline.
+  # This correctly pulls the project ID from the CI environment.
   - "{{ lookup('env', 'CLOUDSDK_CORE_PROJECT') }}"
-auth_kind: serviceaccount
-# This correctly uses the temporary credentials file created by the google-github-actions/auth step.
-service_account_file: "{{ lookup('env', 'GOOGLE_APPLICATION_CREDENTIALS') }}"
 
-# [CHANGE] Filter to only include RUNNING instances. This is a best practice.
+# [FIX] Removed the 'service_account_file' line.
+# The plugin will now automatically use the GOOGLE_APPLICATION_CREDENTIALS
+# environment variable set by the google-github-actions/auth step.
+auth_kind: serviceaccount
+
 filters:
   - "status = RUNNING"
 
-# Use the instance's public IP for the SSH connection.
 hostnames:
   - key: networkInterfaces[0].accessConfigs[0].natIP
 
-# Set the ansible_host variable to the public IP.
 compose:
   ansible_host: networkInterfaces[0].accessConfigs[0].natIP
 
-# [CHANGE] Enabled grouping based on the 'ansible-group' label set in Terraform.
-# This creates a host group named 'web-server' that you can target in your playbook.
 keyed_groups:
   - key: labels['ansible-group']
     prefix: ''
+
