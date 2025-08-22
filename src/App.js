@@ -16,6 +16,7 @@ const App = () => {
   const handleCalculate = () => {
     try {
       let expression = input.replace(/√/g, 'sqrt').replace(/\^/g, '^').replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-');
+      expression = expression.replace(/sqrt(\d+(\.\d+)?)/g, 'sqrt($1)');
       const result = math.evaluate(expression);
       setInput(result.toString());
     } catch (error) {
