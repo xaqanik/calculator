@@ -20,7 +20,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/xaqanik/calculator.git', credentialsId: 'github-pat'
+                git branch: 'master', url: 'https://github.com/xaqanik/calculator.git', credentialsId: 'github-pat'
             }
         }
 
