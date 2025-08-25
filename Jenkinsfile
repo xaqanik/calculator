@@ -6,7 +6,6 @@ pipeline {
         GCP_PROJECT_ID = 'mystical-vial-403905'
         GCP_REGION = 'us-central1'
         
-
         // --- Docker Hub Configuration ---
         DOCKERHUB_USERNAME = 'xaqanik'
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
@@ -27,7 +26,8 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh 'docker run --rm -v "$(pwd)/src:/usr/src" sonarsource/sonar-scanner-cli:latest -Dsonar.projectKey=react-app -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONAR_TOKEN}'
+                    // This command is now fixed with --network="host"
+                    sh 'docker run --rm --network="host" -v "$(pwd)/src:/usr/src" sonarsource/sonar-scanner-cli:latest -Dsonar.projectKey=react-app -Dsonar.sources=. -Dsonar.host.url=http://localhost:9000 -Dsonar.login=${SONAR_TOKEN}'
                 }
             }
         }
@@ -47,10 +47,8 @@ pipeline {
 
         stage('Provision Infrastructure') {
             steps {
-                // Use withCredentials to load the GCP key file
                 withCredentials([file(credentialsId: 'gcp-creds', variable: 'GCP_CREDS_FILE')]) {
                     dir('terraform') {
-                        // Authenticate using the path to the key file
                         sh "gcloud auth activate-service-account --key-file=${GCP_CREDS_FILE}"
                         sh 'terraform init'
                         sh "terraform apply -auto-approve -var='gcp_project_id=${GCP_PROJECT_ID}' -var='gcp_region=${GCP_REGION}'"
