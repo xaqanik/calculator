@@ -1,0 +1,28 @@
+- name: Configure App Server and Deploy Docker Container
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: GCloud docker login
+      command: gcloud auth configure-docker {{ gcp_region }}-docker.pkg.dev -q
+
+    - name: Pull Docker image from Artifact Registry
+      command: docker pull {{ image_name }}
+
+    - name: Run the application container
+      command: docker run -d -p 80:80 --name my-app-container --rm {{ image_name }}
