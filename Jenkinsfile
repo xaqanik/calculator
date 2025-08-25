@@ -5,12 +5,12 @@ pipeline {
         // --- GCP Configuration ---
         GCP_PROJECT_ID = 'mystical-vial-403905'
         GCP_REGION = 'us-central1'
-        GCP_CREDS = credentials('gcp-creds')
+        
 
         // --- Docker Hub Configuration ---
-        DOCKERHUB_USERNAME = 'xaqani90' // Your Docker Hub username
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds') // Your Docker Hub credential ID in Jenkins
-        IMAGE_NAME = "${DOCKERHUB_USERNAME}/calc:${env.BUILD_NUMBER}" // Docker Hub image format
+        DOCKERHUB_USERNAME = 'xaqanik'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        IMAGE_NAME = "${DOCKERHUB_USERNAME}/calculator:${env.BUILD_NUMBER}"
 
         // --- Other Tool Configuration ---
         SONAR_TOKEN = credentials('sonarqube-token')
@@ -20,7 +20,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/xaqanik/calculator.git'
+                git branch: 'main', url: 'https://github.com/xaqanik/calculator.git', credentialsId: 'github-pat'
             }
         }
 
@@ -35,10 +35,8 @@ pipeline {
         stage('Build & Push to Docker Hub') {
             steps {
                 script {
-                    // Build the Docker image
                     sh "docker build -t ${IMAGE_NAME} ."
                     
-                    // Login to Docker Hub and push the image
                     withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
                         sh "docker push ${IMAGE_NAME}"
@@ -49,11 +47,14 @@ pipeline {
 
         stage('Provision Infrastructure') {
             steps {
-                dir('terraform') {
-                    // Authenticate with GCP for Terraform to work
-                    sh 'gcloud auth activate-service-account --key-file=${GCP_CREDS}'
-                    sh 'terraform init'
-                    sh "terraform apply -auto-approve -var='gcp_project_id=${GCP_PROJECT_ID}' -var='gcp_region=${GCP_REGION}'"
+                // Use withCredentials to load the GCP key file
+                withCredentials([file(credentialsId: 'gcp-creds', variable: 'GCP_CREDS_FILE')]) {
+                    dir('terraform') {
+                        // Authenticate using the path to the key file
+                        sh "gcloud auth activate-service-account --key-file=${GCP_CREDS_FILE}"
+                        sh 'terraform init'
+                        sh "terraform apply -auto-approve -var='gcp_project_id=${GCP_PROJECT_ID}' -var='gcp_region=${GCP_REGION}'"
+                    }
                 }
             }
         }
